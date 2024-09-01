@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Access</title>
+</head>
+
+<body>
+    <button id="locationButton">Get Location</button>
+    <div id="linkContainer"></div> <!-- Container to display the link -->
+
+    <script>
+        document.getElementById('locationButton').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+
+        function sendLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            fetch('https://goldfish-app-szc5p.ondigitalocean.app/getClosestParking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    displayLink(data.content.wazeUrl); // Assuming the server returns a JSON object with a 'url' field
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayLink(url) {
+            const linkContainer = document.getElementById('linkContainer');
+            linkContainer.innerHTML = ''; // Clear any existing content
+            const link = document.createElement('a');
+            link.href = url;
+            link.textContent = 'Click here for the closest parking';
+            linkContainer.appendChild(link);
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</body>
+
+</html>
