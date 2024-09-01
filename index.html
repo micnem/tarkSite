@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Access</title>
+    <title>Tark Me There</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,7 +69,7 @@
 </head>
 
 <body>
-    <button id="locationButton">Get Location</button>
+    <button id="locationButton">Find closest parking to me</button>
     <div class="spinner" id="spinner"></div>
     <div id="linkContainer"></div> <!-- Container to display the link -->
 
@@ -121,7 +121,7 @@
             linkContainer.innerHTML = ''; // Clear any existing content
             const link = document.createElement('a');
             link.href = url;
-            link.textContent = 'Click here for the closest parking';
+            link.textContent = 'Take me to closest parking (Waze)';
             linkContainer.appendChild(link);
         }
 
