@@ -46,19 +46,46 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
     <button id="locationButton">Get Location</button>
+    <div class="spinner" id="spinner"></div>
     <div id="linkContainer"></div> <!-- Container to display the link -->
 
     <script>
         document.getElementById('locationButton').addEventListener('click', () => {
+            const button = document.getElementById('locationButton');
+            const spinner = document.getElementById('spinner');
+            button.style.display = 'none';
+            spinner.style.display = 'block';
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendLocation, showError);
             } else {
                 alert("Geolocation is not supported by this browser.");
+                button.style.display = 'block';
+                spinner.style.display = 'none';
             }
         });
 
@@ -83,6 +110,9 @@
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                })
+                .finally(() => {
+                    document.getElementById('spinner').style.display = 'none';
                 });
         }
 
@@ -96,6 +126,11 @@
         }
 
         function showError(error) {
+            const button = document.getElementById('locationButton');
+            const spinner = document.getElementById('spinner');
+            button.style.display = 'block';
+            spinner.style.display = 'none';
+
             switch (error.code) {
                 case error.PERMISSION_DENIED:
                     alert("User denied the request for Geolocation.");
