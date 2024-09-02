@@ -36,6 +36,7 @@
 
         #linkContainer {
             margin-top: 20px;
+            text-align: center; 
         }
 
         a {
@@ -109,7 +110,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
-                    displayLink(data.content.wazeUrl); // Assuming the server returns a JSON object with a 'url' field
+                    displayLink(data.content.wazeUrl, data.content.title); // Pass the title to displayLink
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -119,9 +120,18 @@
                 });
         }
 
-        function displayLink(url) {
+        function displayLink(url, title) {
             const linkContainer = document.getElementById('linkContainer');
             linkContainer.innerHTML = ''; // Clear any existing content
+
+            // Create and append the title element
+            const titleElement = document.createElement('div');
+            titleElement.textContent = title;
+            titleElement.style.fontSize = '20px';
+            titleElement.style.marginBottom = '10px';
+            linkContainer.appendChild(titleElement);
+
+            // Create and append the link element
             const link = document.createElement('a');
             link.href = url;
             link.textContent = 'Take me to closest parking (Waze)';
