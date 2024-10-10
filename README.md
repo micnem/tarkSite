@@ -28,7 +28,7 @@ Welcome to **Tark Me There**, a web application designed to help you find the cl
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/tark-me-there.git
+   git clone https://github.com/micnem/tarkSite
    ```
 2. Open `index.html` in your web browser.
 
@@ -44,7 +44,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## License
 
-This project is licensed under the MIT License. See the [https://github.com/micnem/tarkSite/blob/master/LICENCE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Support
 
