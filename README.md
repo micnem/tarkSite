@@ -2,6 +2,8 @@
 
 Welcome to **Tark Me There**, a web application designed to help you find the closest parking spot to your current location using geolocation services and Waze integration.
 
+**Visit the website:** [tarkmethere.com](https://tarkmethere.com)
+
 ## Features
 
 - **Geolocation**: Automatically detects your current location.
