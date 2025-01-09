@@ -73,9 +73,9 @@
 </head>
 
 <body>
-    <button id="locationButton">Find closest parking to me</button>
+    <button id="locationButton">Show available parking</button>
     <div class="spinner" id="spinner"></div>
-    <div id="linkContainer"></div> <!-- Container to display the link -->
+    <div id="linkContainer"></div>
 
     <script>
         document.getElementById('locationButton').addEventListener('click', () => {
@@ -84,18 +84,6 @@
             button.style.display = 'none';
             spinner.style.display = 'block';
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendLocation, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-                button.style.display = 'block';
-                spinner.style.display = 'none';
-            }
-        });
-
-        function sendLocation(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
             fetch('https://goldfish-app-szc5p.ondigitalocean.app/getClosestParking', {
                 method: 'POST',
@@ -103,62 +91,56 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    latitude: latitude,
-                    longitude: longitude,
                     isMobile
                 })
             })
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
-                    displayLink(data.content.wazeUrl, data.content.title); // Pass the title to displayLink
+                    displayLinks(data.content);
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    alert("Failed to fetch parking locations. Please try again.");
                 })
                 .finally(() => {
                     document.getElementById('spinner').style.display = 'none';
                 });
-        }
+        });
 
-        function displayLink(url, title) {
+        function displayLinks(locations) {
             const linkContainer = document.getElementById('linkContainer');
             linkContainer.innerHTML = ''; // Clear any existing content
 
-            // Create and append the title element
-            const titleElement = document.createElement('div');
-            titleElement.textContent = title;
-            titleElement.style.fontSize = '20px';
-            titleElement.style.marginBottom = '10px';
-            linkContainer.appendChild(titleElement);
+            // Create a container for all locations
+            const locationsContainer = document.createElement('div');
+            locationsContainer.style.display = 'flex';
+            locationsContainer.style.flexDirection = 'column';
+            locationsContainer.style.gap = '20px';
+            locationsContainer.style.marginTop = '20px';
 
-            // Create and append the link element
-            const link = document.createElement('a');
-            link.href = url;
-            link.textContent = 'Tark me there! (Waze)';
-            linkContainer.appendChild(link);
-        }
+            locations.forEach(location => {
+                // Create a container for each location
+                const locationDiv = document.createElement('div');
+                locationDiv.style.textAlign = 'center';
 
-        function showError(error) {
-            const button = document.getElementById('locationButton');
-            const spinner = document.getElementById('spinner');
-            button.style.display = 'block';
-            spinner.style.display = 'none';
+                // Create and append the title element
+                const titleElement = document.createElement('div');
+                titleElement.textContent = location.title;
+                titleElement.style.fontSize = '20px';
+                titleElement.style.marginBottom = '10px';
+                locationDiv.appendChild(titleElement);
 
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurred.");
-                    break;
-            }
+                // Create and append the link element
+                const link = document.createElement('a');
+                link.href = location.wazeUrl;
+                link.textContent = 'Tark me there! (Waze)';
+                locationDiv.appendChild(link);
+
+                locationsContainer.appendChild(locationDiv);
+            });
+
+            linkContainer.appendChild(locationsContainer);
         }
     </script>
     <div style="text-align: center;">
