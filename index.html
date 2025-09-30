@@ -174,16 +174,13 @@
 
 <body>
     <div class="container">
-        <button id="locationButton">Find Parking Locations</button>
         <div class="spinner" id="spinner"></div>
         <div id="linkContainer"></div>
     </div>
 
     <script>
-        document.getElementById('locationButton').addEventListener('click', () => {
-            const button = document.getElementById('locationButton');
+        function fetchParkingLocations() {
             const spinner = document.getElementById('spinner');
-            button.style.display = 'none';
             spinner.style.display = 'block';
 
             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -203,12 +200,17 @@
                 })
                 .catch((error) => {
                     console.error('Error:', error);
-                    alert("Failed to fetch parking locations. Please try again.");
                 })
                 .finally(() => {
                     document.getElementById('spinner').style.display = 'none';
                 });
-        });
+        }
+
+        // Fetch immediately on page load
+        fetchParkingLocations();
+
+        // Fetch every 5 seconds
+        setInterval(fetchParkingLocations, 5000);
 
         function displayLinks(locations) {
             const linkContainer = document.getElementById('linkContainer');
