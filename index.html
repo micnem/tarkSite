@@ -23,121 +23,126 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
             padding: 20px;
             background-color: var(--background-color);
             color: var(--text-color);
         }
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
             text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .status-bar {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1;
+            gap: 12px;
+            font-size: 14px;
+            color: #666;
         }
 
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 500;
-            color: #fff;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-            display: inline-block;
-            margin: 0 auto;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary-color);
+        .loading-indicator {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 123, 255, 0.3);
+            border-top-color: var(--primary-color);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin: 20px auto;
+            animation: spin 0.8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .loading-indicator.active {
+            opacity: 1;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .parking-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
         }
 
         .parking-card {
             background: var(--card-background);
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 24px;
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .parking-card.available {
+            border-left-color: var(--success-color);
+        }
+
+        .parking-card.unavailable {
+            border-left-color: var(--danger-color);
         }
 
         .parking-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .parking-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
 
         .parking-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin: 0;
         }
 
-        .availability-icon {
-            width: 24px;
-            height: 24px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 14px;
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .available {
-            background-color: var(--success-color);
-            color: white;
+        .status-badge.available {
+            background-color: #d4edda;
+            color: #155724;
         }
 
-        .unavailable {
-            background-color: var(--danger-color);
-            color: white;
+        .status-badge.unavailable {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         .waze-link {
-            display: inline-block;
-            padding: 8px 16px;
+            display: block;
+            padding: 12px 20px;
             background-color: var(--primary-color);
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 500;
+            text-align: center;
             transition: background-color 0.3s ease;
         }
 
@@ -146,7 +151,8 @@
         }
 
         .donate-section {
-            margin-top: 40px;
+            max-width: 1200px;
+            margin: 40px auto 0;
             text-align: center;
             padding: 20px;
             background: var(--card-background);
@@ -164,24 +170,45 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .parking-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
             }
         }
     </style>
 </head>
 
 <body>
+    <div class="header">
+        <h1>Live Parking Availability</h1>
+        <div class="status-bar">
+            <span id="lastUpdate">Loading...</span>
+            <div class="loading-indicator" id="loadingIndicator"></div>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="spinner" id="spinner"></div>
-        <div id="linkContainer"></div>
+        <div id="parkingContainer" class="parking-grid"></div>
     </div>
 
     <script>
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdate').textContent = `Last updated: ${timeString}`;
+        }
+
         function fetchParkingLocations() {
-            const spinner = document.getElementById('spinner');
-            spinner.style.display = 'block';
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.classList.add('active');
 
             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
             fetch('https://tarking.micnem.com/getAllParkingLots', {
@@ -196,14 +223,49 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
-                    displayLinks(data.content);
+                    displayParkingLocations(data.content);
+                    updateTimestamp();
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    document.getElementById('lastUpdate').textContent = 'Failed to fetch data';
                 })
                 .finally(() => {
-                    document.getElementById('spinner').style.display = 'none';
+                    loadingIndicator.classList.remove('active');
                 });
+        }
+
+        function displayParkingLocations(locations) {
+            const container = document.getElementById('parkingContainer');
+            container.innerHTML = '';
+
+            locations.forEach(location => {
+                const card = document.createElement('div');
+                card.className = `parking-card ${location.isEmpty ? 'available' : 'unavailable'}`;
+
+                const header = document.createElement('div');
+                header.className = 'parking-header';
+
+                const title = document.createElement('h2');
+                title.className = 'parking-title';
+                title.textContent = location.name;
+
+                const badge = document.createElement('span');
+                badge.className = `status-badge ${location.isEmpty ? 'available' : 'unavailable'}`;
+                badge.textContent = location.isEmpty ? 'Available' : 'Full';
+
+                header.appendChild(title);
+                header.appendChild(badge);
+                card.appendChild(header);
+
+                const link = document.createElement('a');
+                link.href = location.wazeUrl;
+                link.className = 'waze-link';
+                link.textContent = 'Navigate with Waze';
+                card.appendChild(link);
+
+                container.appendChild(card);
+            });
         }
 
         // Fetch immediately on page load
@@ -211,45 +273,6 @@
 
         // Fetch every 5 seconds
         setInterval(fetchParkingLocations, 5000);
-
-        function displayLinks(locations) {
-            const linkContainer = document.getElementById('linkContainer');
-            linkContainer.innerHTML = ''; // Clear any existing content
-
-            // Create a grid container for all locations
-            const locationsGrid = document.createElement('div');
-            locationsGrid.className = 'parking-grid';
-
-            locations.forEach(location => {
-                // Create a card for each location
-                const card = document.createElement('div');
-                card.className = 'parking-card';
-
-                // Create and append the title element with availability icon
-                const titleElement = document.createElement('div');
-                titleElement.className = 'parking-title';
-                
-                const availabilityIcon = document.createElement('span');
-                availabilityIcon.className = `availability-icon ${location.isEmpty ? 'available' : 'unavailable'}`;
-                availabilityIcon.innerHTML = location.isEmpty ? '✓' : '✕';
-                availabilityIcon.title = location.isEmpty ? 'Parking Available' : 'No Parking Available';
-                
-                titleElement.appendChild(availabilityIcon);
-                titleElement.appendChild(document.createTextNode(location.name));
-                card.appendChild(titleElement);
-
-                // Create and append the Waze link
-                const link = document.createElement('a');
-                link.href = location.wazeUrl;
-                link.className = 'waze-link';
-                link.textContent = 'Navigate with Waze';
-                card.appendChild(link);
-
-                locationsGrid.appendChild(card);
-            });
-
-            linkContainer.appendChild(locationsGrid);
-        }
     </script>
 
     <div class="donate-section">
